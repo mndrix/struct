@@ -71,3 +71,17 @@ sample(X) :-
     sample(S),
     exists(_,S,[Field-en]), % which field holds the language?
     Field == lang.
+
+'struct -> dictionary' :-
+    sample(H),
+    struct_dict(H,D),
+    D.lang == en,
+    D.whom == "Michael".
+
+'dictionary -> struct' :-
+    struct_dict(H,Tag{whom:"John",lang:es}),
+    Tag == hello,
+    struct:lang(H,Lang),
+    Lang == es,
+    struct:whom(H,Whom),
+    Whom == "John".

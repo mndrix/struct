@@ -11,6 +11,7 @@
                   , exists/2
                   , exists/3
                   , field/3
+                  , struct_dict/2
                   ]).
 
 :- use_module(library(lambda)).
@@ -112,6 +113,21 @@ current_structure(Name) :-
 struct_name(Struct,StructName) :-
     must_be(nonvar,Struct),
     functor(Struct,StructName,_).
+
+
+%% struct_dict(+Struct:struct, -Dict:dict) is det.
+%% struct_dict(-Struct:struct, +Dict:dict) is nondet.
+%
+%  True if Struct and Dict represent the same data. The name of the
+%  Struct type is used as the tag of the Dict.
+struct_dict(Struct,Dict) :-
+    ( nonvar(Dict) ->
+        dict_pairs(Dict,Name,Pairs),
+        exists(Name,Struct,Pairs)
+    ; must_be(nonvar,Struct) ->
+        exists(Name,Struct,Pairs),
+        dict_pairs(Dict,Name,Pairs)
+    ).
 
 
 /******** macro code below here ***********/
