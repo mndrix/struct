@@ -109,13 +109,15 @@ current_structure(Name) :-
 :- multifile field_property/3.
 
 
-structure(Definition) :-
-    throw(struct("structure macro not expanded",Definition)).
-
-
 struct_name(Struct,StructName) :-
     must_be(nonvar,Struct),
     functor(Struct,StructName,_).
+
+
+/******** macro code below here ***********/
+
+structure(Definition) :-
+    throw(struct("structure macro not expanded",Definition)).
 
 
 % define macros in a separate predicate to ease testing
