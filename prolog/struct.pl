@@ -8,9 +8,12 @@
 
                   % relations
                   , exists/2
+                  , exists/3
                   , field/3
                   ]).
 
+:- use_module(library(lambda)).
+:- use_module(library(pairs), [pairs_keys_values/3]).
 
 
 %% exists(+Name:atom, -Struct:struct) is det.
@@ -19,6 +22,29 @@
 %  True if Struct is a structure named Name. Raises a signal if there is
 %  no structure named Name.
 :- multifile exists/2.
+
+
+%% exists(?Name:atom, +Struct:struct, +FieldValues:pairs) is semidet.
+%% exists(?Name:atom, +Struct:struct, -FieldValues:pairs) is semidet.
+%% exists(+Name:atom, -Struct:struct, +FieldValues:pairs) is semidet.
+%% exists(-Name:atom, -Struct:struct, +FieldValues:pairs) is nondet.
+%
+%  True if a Struct named Name has field-value pairs as described by
+%  FieldValues.
+exists(Name,Struct,FieldValues) :-
+    when( ground(Name);nonvar(Struct), exists(Name,Struct) ),
+
+    ( is_list(FieldValues) ->  % declaring struct based on fields
+        maplist(exists_mapper(Struct),FieldValues)
+    ; true -> % extracting fields from struct
+        must_be(ground, Name),  % otherwise, exists/3 mode was bad
+        setof(F,structure_property(Name,field(F)),Fields),
+        maplist(\F^V^(field(F,Struct,V)),Fields,Values),
+        pairs_keys_values(FieldValues,Fields,Values)
+    ).
+
+exists_mapper(Struct,Field-Value) :-
+    field(Field,Struct,Value).
 
 
 %% field(+FieldName:atom,+Struct:struct,-Value) is det.

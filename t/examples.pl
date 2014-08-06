@@ -34,3 +34,40 @@ sample(X) :-
 'wrong type on a field'(fail) :-
     exists(hello, H),
     field(whom, H, michael).  % should be a string, not atom
+
+'extract fields and values with exists/3' :-
+    sample(S),
+    exists(N,S,Ps),
+    N == hello,
+    Ps == [lang-en, whom-"Michael"].
+
+'extract values with exists/3' :-
+    sample(S),
+    exists(N, S, [lang-Lang]),
+    N == hello,
+    Lang == en.
+
+'create specific struct with exists/3' :-
+    exists(hello, S, [whom-"Johann",lang-de]),
+    struct:lang(S,Lang),
+    Lang == de,
+    struct:whom(S,Whom),
+    Whom == "Johann".
+
+'create some struct with exists/3' :-
+    exists(N, S, [whom-"Johann",lang-de]),
+    N == hello,
+    struct:lang(S,Lang),
+    Lang == de,
+    struct:whom(S,Whom),
+    Whom == "Johann".
+
+'check all struct fields with exists/3' :-
+    sample(S),
+    exists(N,S,[whom-"Michael",lang-en]),
+    N == hello.
+
+'query a field name with exists/3' :-
+    sample(S),
+    exists(_,S,[Field-en]), % which field holds the language?
+    Field == lang.
