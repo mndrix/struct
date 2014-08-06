@@ -7,6 +7,7 @@
                   , field_property/3
 
                   % relations
+                  , defaults/1
                   , exists/2
                   , exists/3
                   , field/3
@@ -14,6 +15,29 @@
 
 :- use_module(library(lambda)).
 :- use_module(library(pairs), [pairs_keys_values/3]).
+
+
+%% defaults(:Struct:struct) is det.
+%
+%  True if uninstantiated field values in Struct can be unified with the
+%  default value for that field, if one exists. This is typically used
+%  after declaring everything one knows about a struct but before using
+%  it.  For example,
+%
+%      exists(person, P),
+%      struct:name(P, jason),  % we know his name
+%      defaults(P).            % use default values for other fields
+defaults(Struct) :-
+    must_be(nonvar,Struct),
+    struct_name(Struct, StructName),
+    bagof(F-D,field_property(StructName,F,default(D)),Defaults),
+    foreach( member(F-D,Defaults)
+           , defaults_(F,Struct,D)
+           ).
+
+defaults_(FieldName,Struct,DefaultValue) :-
+    field(FieldName, Struct, Value),
+    ( var(Value) -> field(FieldName,Struct,DefaultValue); true ).
 
 
 %% exists(+Name:atom, -Struct:struct) is det.
@@ -79,6 +103,7 @@ current_structure(Name) :-
 %  True if a structure named StructName has a field named FieldName and
 %  that field has a Property.  Property is one of:
 %
+%      * default(V) - optional default value
 %      * type(T) - field's type. =|any|= if none was specified.
 :- multifile field_property/3.
 
@@ -115,13 +140,19 @@ expansion(Args,StructName,Arity) -->
 per_arg([],_,_,_) -->
     [].
 per_arg([Arg|Args],Position0,StructName,Arity) -->
-    { once( Arg=FieldName:Type
-          ; (FieldName=Arg, Type=any)
+    { once( (Arg=(FieldName:Type=Default))
+          ; (Arg=(FieldName:Type))
+          ; (Arg=(FieldName=Default),Type=any)
+          ; (Arg=(FieldName),Type=any)
           )
     },
     [ struct:structure_property(StructName,field(FieldName)) ],
     [ struct:field_property(StructName,FieldName,type(Type)) ],
     [ struct:field_property(StructName,FieldName,position(Position0)) ],
+    ( { nonvar(Default) } ->
+        [ struct:field_property(StructName,FieldName,default(Default)) ]
+    ; []
+    ),
 
     accessors(StructName,Arity,FieldName,Position0),
 
