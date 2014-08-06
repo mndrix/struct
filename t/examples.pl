@@ -2,6 +2,11 @@
 
 :- structure hello(whom:string, lang:atom).
 
+sample(X) :-
+    exists(hello, X),
+    struct:whom(X,"Michael"),
+    struct:lang(X,en).
+
 :- use_module(library(tap)).
 
 
@@ -24,9 +29,7 @@
     field(lang, H, en).
 
 'populating fields of a struct value: static accessor' :-
-    exists(hello, H),
-    struct:whom(H, "Michael"),
-    struct:lang(H, en).
+    sample(_).
 
 'wrong type on a field'(fail) :-
     exists(hello, H),
