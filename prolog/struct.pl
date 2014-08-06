@@ -104,6 +104,7 @@ current_structure(Name) :-
 %  that field has a Property.  Property is one of:
 %
 %      * default(V) - optional default value
+%      * position(N) - =|arg(N,_,_)|= for this field
 %      * type(T) - field's type. =|any|= if none was specified.
 :- multifile field_property/3.
 
