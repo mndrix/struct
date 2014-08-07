@@ -11,6 +11,7 @@
                   , exists/2
                   , exists/3
                   , field/3
+                  , in_db/1
                   , struct_dict/2
                   ]).
 
@@ -130,6 +131,19 @@ struct_dict(Struct,Dict) :-
     ).
 
 
+%% in_db(?Struct:struct)
+%
+%  True if Struct is found in the database. Iterates solutions on
+%  backtracking.
+%
+%  This is temporarily an alias for call/1 with automatic
+%  conversion from dicts. It may eventually consider a broader
+%  definition of "db".
+in_db(Struct0) :-
+    ( is_dict(Struct0) -> struct_dict(Struct,Struct0); Struct=Struct0 ),
+    call(Struct).
+
+
 /******** macro code below here ***********/
 
 structure(Definition) :-
@@ -137,6 +151,9 @@ structure(Definition) :-
 
 
 % define macros in a separate predicate to ease testing
+macro(term,Dict,Fact) :-
+    is_dict(Dict),
+    struct_dict(Fact, Dict).
 macro(term,(:-structure(Definition)),Terms) :-
     functor(Definition,Name,Arity),
     ( current_structure(Name)-> throw(struct("duplicate structure",Name)); true ),
