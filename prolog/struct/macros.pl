@@ -52,11 +52,13 @@ per_arg([Arg|Args],Position0,StructName,Arity) -->
 
 
 accessors(StructName,Arity,FieldName,ArgPosition) -->
-    { Head =.. [FieldName,Struct,Value] },
     { functor(Struct,StructName,Arity) },
+
+    % FieldName/2 accessor predicate
+    { Accessor2 =.. [FieldName,Struct,Value] },
     { arg(ArgPosition,Struct,Value) },
     [ :- multifile struct:FieldName/2 ],
-    [ struct:Head ],
+    [ struct:Accessor2 ],
     [ struct:field(FieldName,Struct,Value) ].
 
 
