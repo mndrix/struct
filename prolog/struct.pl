@@ -12,11 +12,21 @@
                   , exists/3
                   , field/3
                   , in_db/1
+                  , is_struct/1
                   , struct_dict/2
                   ]).
 
 :- use_module(library(lambda)).
 :- use_module(library(pairs), [pairs_keys_values/3]).
+
+% define struct types for library(error)
+:- multifile error:has_type/2.
+error:has_type(struct, Struct) :-
+    is_struct(Struct).
+error:has_type(struct(Name), Struct) :-
+    atom(Name),
+    is_struct(Struct),
+    struct_name(Struct,Name).
 
 
 %% defaults(:Struct:struct) is det.
@@ -143,6 +153,14 @@ in_db(Struct0) :-
     ( is_dict(Struct0) -> struct_dict(Struct,Struct0); Struct=Struct0 ),
     call(Struct).
 
+%% is_struct(+Struct:struct) is semidet.
+%
+%  True if Struct is a valid struct value. Validity includes
+%  checking name, arity and field types.
+is_struct(Struct) :-
+    compound(Struct),
+    \+ \+ exists(_,Struct).  % don't add field type constraints
+
 
 /******** macro code below here ***********/
 
@@ -168,6 +186,10 @@ expansion(Args,StructName,Arity) -->
     { functor(Empty,StructName,Arity) },
     [ struct:exists(StructName,Empty) :-
           struct:constrain_fields(Empty)
+    ],
+
+    [ error:has_type(StructName,Empty) :-
+          error:has_type(struct(StructName),Empty)
     ],
 
     per_arg(Args,1,StructName,Arity).
