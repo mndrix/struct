@@ -10,6 +10,7 @@
                   , defaults/1
                   , exists/2
                   , exists/3
+                  , field/2
                   , field/3
                   , in_db/1
                   , is_struct/1
@@ -92,6 +93,13 @@ exists(Name,Struct,FieldValues) :-
 
 exists_mapper(Struct,Field-Value) :-
     field(Field,Struct,Value).
+
+
+%% field(+FieldName:atom,-Struct:struct) is nondet.
+%% field(-FieldName:atom,+Struct:struct) is semidet.
+%
+%  True if Struct has a field named FieldName.
+:- multifile field/2.
 
 
 %% field(+FieldName:atom,+Struct:struct,-Value) is det.

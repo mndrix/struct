@@ -54,6 +54,12 @@ per_arg([Arg|Args],Position0,StructName,Arity) -->
 accessors(StructName,Arity,FieldName,ArgPosition) -->
     { functor(Struct,StructName,Arity) },
 
+    % FieldName/1 semidet accessor
+    { Accessor1 =.. [FieldName,Struct] },
+    [ :- multifile struct:FieldName/1 ],
+    [ struct:Accessor1 ],
+    [ struct:field(FieldName,Struct) ],
+
     % FieldName/2 accessor predicate
     { Accessor2 =.. [FieldName,Struct,Value] },
     { arg(ArgPosition,Struct,Value) },

@@ -18,7 +18,12 @@ sample(X) :-
     exists(Name, Hello),
     Name == hello.
 
-'structure has proper field names' :-
+'structure has proper field names: field/2' :-
+    exists(hello, Hello),
+    setof(F,field(F,Hello),Fields),
+    Fields == [lang,whom].
+
+'structure has proper field names: field/3' :-
     exists(hello, Hello),
     setof(F,V^field(F,Hello,V),Fields),
     Fields == [lang,whom].
