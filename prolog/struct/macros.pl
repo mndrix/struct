@@ -46,6 +46,7 @@ per_arg([Arg|Args],Position0,StructName,Arity) -->
     ),
 
     accessors(StructName,Arity,FieldName,Position0),
+    modifiers(StructName,Arity,FieldName,Position0),
 
     { succ(Position0,Position) },
     per_arg(Args,Position,StructName,Arity).
@@ -66,6 +67,54 @@ accessors(StructName,Arity,FieldName,ArgPosition) -->
     [ :- multifile struct:FieldName/2 ],
     [ struct:Accessor2 ],
     [ struct:field(FieldName,Struct,Value) ].
+
+modifiers(StructName,Arity,FieldName,ArgPosition) -->
+    modifier_3(StructName,Arity,FieldName,ArgPosition),
+    modifier_4(StructName,Arity,FieldName,ArgPosition),
+    modifier_5(StructName,Arity,FieldName,ArgPosition).
+
+modifier_3(StructName,Arity,FieldName,ArgPosition) -->
+    % FieldName/3 modifier predicate
+    { functor(Struct0,StructName,Arity) },
+    { functor(Struct1,StructName,Arity) },
+    { same_but(Struct0, Struct1, ArgPosition) },
+    { arg(ArgPosition,Struct1,Val1) },
+    { Modifier3 =.. [FieldName, Val1, Struct0, Struct1] },
+    [ :- multifile FieldName/3 ],
+    [ struct:Modifier3 ].
+
+modifier_4(StructName,Arity,FieldName,ArgPosition) -->
+    % FieldName/4 modifier predicate
+    { functor(Struct0,StructName,Arity) },
+    { functor(Struct1,StructName,Arity) },
+    { same_but(Struct0, Struct1, ArgPosition )},
+    { arg(ArgPosition,Struct0,Val0) },
+    { arg(ArgPosition,Struct1,Val1) },
+    { Modifier4 =.. [FieldName,Val0,Val1,Struct0,Struct1] },
+    [ :- multifile FieldName/4 ],
+    [ struct:Modifier4 ].
+
+modifier_5(StructName,Arity,FieldName,ArgPosition) -->
+    % field/5 modifier predicate
+    { functor(Struct0,StructName,Arity) },
+    { functor(Struct1,StructName,Arity) },
+    { same_but(Struct0, Struct1, ArgPosition )},
+    { arg(ArgPosition,Struct0,Val0) },
+    { arg(ArgPosition,Struct1,Val1) },
+    [ struct:field(FieldName,Val0,Val1,Struct0,Struct1) ].
+
+
+% Struct0 and Struct1 share all arguments except number N
+same_but(Struct0, Struct1, N) :-
+    Struct0 =.. List0,
+    Struct1 =.. List1,
+    length(List0, Size),
+    Max is Size - 1,
+    setof(I,between(0,Max,I),Indexes),
+    maplist(same_but_(N),Indexes,List0,List1).
+
+same_but_(N,I,Arg0,Arg1) :-
+    ( N=I -> true; Arg0=Arg1 ).
 
 
 constrain_fields(Struct) :-

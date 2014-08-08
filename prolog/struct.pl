@@ -12,6 +12,8 @@
                   , exists/3
                   , field/2
                   , field/3
+                  , field/4
+                  , field/5
                   , in_db/1
                   , is_struct/1
                   , struct_dict/2
@@ -109,6 +111,31 @@ exists_mapper(Struct,Field-Value) :-
 %  True if Struct has a field named FieldName where that field has
 %  Value.
 :- multifile field/3.
+
+
+%% field(?FieldName:atom,?Val1,?Struct0,?Struct1)
+%
+%  Like field/5, but ignoring the value of Struct0.
+%
+%  If you know FieldName staically, you can call
+%  FieldName/3 instead.
+field(FieldName,Val1,Struct0,Struct1) :-
+    field(FieldName,_,Val1,Struct0,Struct1).
+
+
+%% field(?FieldName:atom,?Val0,?Val1,?Struct0,?Struct1)
+%
+%  True if Struct0 and Struct1 are identical except field
+%  FieldName has value Val0 and Val1, respectively.  This
+%  predicate is often used to "modify" an existing struct:
+%
+%      ?- field(foo,old,new,Old,New).
+%      Old = foo(a, old),
+%      New = foo(a, new).
+%
+%  If you know FieldName statically, you can call
+%  FieldName/4 instead.
+:- multifile field/5.
 
 
 %% current_structure(+Name:atom) is semidet.
