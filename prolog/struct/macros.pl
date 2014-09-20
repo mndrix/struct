@@ -4,10 +4,12 @@
 % define macros in a separate predicate to ease testing
 macro(term,Dict,Fact) :-
     is_dict(Dict),
-    struct_dict(Fact, Dict).
+    struct:struct_dict(Fact, Dict).
 macro(term,(:-structure(Definition)),Terms) :-
     functor(Definition,Name,Arity),
-    ( current_structure(Name)-> throw(struct("duplicate structure",Name)); true ),
+    ( struct:current_structure(Name) ->
+          throw(struct("duplicate structure",Name))
+    ; true ),
     ( Arity == 0 -> throw(struct("invalid arity",Name,Arity)); true ),
     Definition =.. [_|Args],
     phrase(per_struct(Args,Name,Arity),Terms).
@@ -119,14 +121,14 @@ same_but_(N,I,Arg0,Arg1) :-
 
 constrain_fields(Struct) :-
     struct:struct_name(Struct,StructName),
-    bagof(N-T,field_property(StructName,N,type(T)),Types),
+    bagof(N-T,struct:field_property(StructName,N,type(T)),Types),
     maplist(constrain_field(Struct), Types).
 
 constrain_field(Struct,Name-Type) :-
     ( Type = any ->
         true % no constraint needed
     ; true ->
-        field(Name,Struct,Var),
+        struct:field(Name,Struct,Var),
         when(ground(Var),check_type(Struct,Name,Type,Var))
     ).
 
