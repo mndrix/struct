@@ -195,6 +195,7 @@ struct_dict(Struct,Dict) :-
 %  This is temporarily an alias for call/1 with automatic
 %  conversion from dicts. It may eventually consider a broader
 %  definition of "db".
+:- meta_predicate in_db(0).
 in_db(Struct0) :-
     ( is_dict(Struct0) -> struct_dict(Struct,Struct0); Struct=Struct0 ),
     call(Struct).
