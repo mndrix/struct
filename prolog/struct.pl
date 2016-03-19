@@ -101,6 +101,9 @@ exists_mapper(Struct,Field-Value) :-
 %% field(-FieldName:atom,+Struct:struct) is semidet.
 %
 %  True if Struct has a field named FieldName.
+%
+%  If you know FieldName statically, you can call
+%  FieldName/1 instead.
 :- multifile field/2.
 
 
@@ -110,6 +113,9 @@ exists_mapper(Struct,Field-Value) :-
 %
 %  True if Struct has a field named FieldName where that field has
 %  Value.
+%
+%  If you know FieldName statically, you can call
+%  FieldName/2 instead.
 :- multifile field/3.
 
 
