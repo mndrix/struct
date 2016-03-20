@@ -13,7 +13,7 @@
 
 # Installation
 
-Using SWI-Prolog 6.3 or later:
+Using SWI-Prolog 7.3 or later:
 
     ?- pack_install(struct).
 
